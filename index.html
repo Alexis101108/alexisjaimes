@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIGITAL CIRCUIT LAB</title>
+<style>
+:root{--bg:#07111f;--panel:#0d1b2d;--panel2:#10243a;--line:#1e3a56;--blue:#38bdf8;--cyan:#67e8f9;--text:#e6f3ff;--muted:#91a9bf;--green:#4ade80;--red:#fb7185}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#102c49 0,#07111f 42%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:17px 22px;border-bottom:1px solid var(--line);background:#07111fe8;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#0284c7,#22d3ee);display:grid;place-items:center;font-weight:900;color:#031321;box-shadow:0 0 24px #0ea5e955}.brand h1{font-size:17px;letter-spacing:1.5px;margin:0}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:2px;margin-top:3px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button{border:1px solid #285071;background:#102943;color:var(--text);padding:9px 13px;border-radius:9px;cursor:pointer;font-weight:650}button:hover{border-color:var(--blue);background:#153653}.primary{background:linear-gradient(135deg,#0284c7,#0891b2);border:0;color:white}.danger{border-color:#713747;color:#fecdd3}
+main{display:grid;grid-template-columns:220px 1fr;gap:16px;padding:16px;max-width:1600px;margin:auto}.sidebar,.workspace-wrap,.info{background:#0b1a2be8;border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 35px #0003}
+.sidebar{padding:15px;height:max-content}.section-title{font-size:11px;color:var(--cyan);letter-spacing:1.8px;font-weight:800;margin:5px 0 12px}.component{width:100%;display:flex;align-items:center;justify-content:space-between;margin:7px 0;text-align:left;background:#10243a}.component span:last-child{font-size:11px;color:var(--muted);font-weight:500}.hint{font-size:12px;line-height:1.5;color:var(--muted);margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}
+.content{min-width:0}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px}.toolbar strong{font-size:14px}.status{font-size:12px;color:var(--green)}
+.workspace-wrap{overflow:hidden}.workspace-head{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}#workspace{height:610px;position:relative;overflow:hidden;background-color:#081625;background-image:radial-gradient(#285071 1px,transparent 1px);background-size:22px 22px;touch-action:pan-y}
+#wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.wire{fill:none;stroke:#38bdf8;stroke-width:3;filter:drop-shadow(0 0 4px #38bdf866)}.wire.active{stroke:#4ade80}
+.node{position:absolute;width:150px;min-height:88px;border:1px solid #286087;background:linear-gradient(145deg,#132e49,#0c2035);border-radius:12px;box-shadow:0 9px 22px #0006;user-select:none;z-index:2}
+.node-head{height:27px;padding:6px 10px;border-bottom:1px solid #23445f;color:#9edfff;font-size:11px;letter-spacing:1px;display:flex;justify-content:space-between;cursor:grab}.node-body{padding:12px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}.gate-symbol{display:flex;align-items:center;justify-content:center;flex:1;min-width:76px}
+.gate-art{overflow:visible}
+.gate-art path{fill:none;stroke:#e8f4ff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.gate-art circle{fill:#0b1a2b;stroke:#e8f4ff;stroke-width:3}
+.node{min-height:100px}.node-body{min-height:70px}
+.input-node .node-body{justify-content:space-around}
+.input-node .toggle{font-size:20px;min-width:42px;padding:4px 9px;border:1px solid #5b7892;color:#dff6ff}
+.output-node .node-body{justify-content:space-around}
+.led{width:28px;height:36px;border-radius:15px 15px 9px 9px;background:#7f1d1d;border:2px solid #ef4444}
+.led.on{background:#ef4444;border-color:#fecaca;box-shadow:0 0 20px #ef4444}
+.pin{width:11px;height:11px;border-radius:50%;background:#38bdf8;border:2px solid #b9efff;display:inline-block;cursor:crosshair;position:relative;z-index:4}.pin.out{background:#4ade80;border-color:#d1fae5}.pin:hover{transform:scale(1.35)}.pin-label{font-size:10px;color:#9db5c9}.toggle{padding:5px 10px;border-radius:7px;background:#263c52;font-size:12px}.toggle.on{background:#166534;color:#dcfce7;border-color:#4ade80}.led{width:22px;height:22px;border-radius:50%;background:#334155;border:2px solid #64748b;box-shadow:inset 0 0 8px #0008}.led.on{background:#4ade80;border-color:#bbf7d0;box-shadow:0 0 16px #4ade80}
+.node.input-node{width:125px;min-height:80px}.node.output-node{width:130px;min-height:80px}
+.info{padding:14px;margin-top:14px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}.info div{font-size:12px;color:var(--muted)}.info b{color:var(--text)}#truth{margin-left:auto;color:var(--cyan)}
+@media(max-width:760px){main{grid-template-columns:1fr;padding:10px}.sidebar{order:2}.content{order:1}#workspace{height:540px}.brand h1{font-size:14px}header{padding:12px}.actions button{padding:8px;font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">ACL</div><div><h1>DIGITAL CIRCUIT LAB</h1><small>LABORATORIO DE LÓGICA DIGITAL</small></div></div>
+ <div class="actions"><button id="newBtn">Nuevo circuito</button><button id="clearBtn" class="danger">Limpiar</button><button id="helpBtn">Cómo usar</button></div>
+</header>
+<main>
+ <aside class="sidebar">
+  <div class="section-title">ENTRADAS Y SALIDAS</div>
+  <button class="component" data-add="INPUT">＋ Entrada <span>0 / 1</span></button>
+  <button class="component" data-add="OUTPUT">＋ Salida LED <span>indicador</span></button>
+  <div class="section-title" style="margin-top:22px">COMPUERTAS LÓGICAS</div>
+  <button class="component" data-add="AND">＋ AND <span>Y</span></button>
+  <button class="component" data-add="OR">＋ OR <span>O</span></button>
+  <button class="component" data-add="NOT">＋ NOT <span>NO</span></button>
+  <button class="component" data-add="NAND">＋ NAND <span>Y negada</span></button>
+  <button class="component" data-add="NOR">＋ NOR <span>O negada</span></button>
+  <button class="component" data-add="XOR">＋ XOR <span>O exclusiva</span></button>
+  <button class="component" data-add="XNOR">＋ XNOR <span>equivalencia</span></button>
+  <div class="hint"><b>Consejo:</b> agrega componentes, arrástralos por el espacio y conecta los puntos azules (salidas verdes) haciendo clic primero en un pin y después en otro.</div>
+ </aside>
+ <section class="content">
+  <div class="toolbar"><strong>◈ ÁREA DE DISEÑO · CIRCUITO 01</strong><span class="status" id="status">● Simulación activa</span></div>
+  <div class="workspace-wrap">
+   <div class="workspace-head"><span>ESPACIO DE TRABAJO</span><span>Arrastra los bloques para acomodarlos</span></div>
+   <div id="workspace"><svg id="wires"></svg></div>
+  </div>
+  <div class="info"><div><b>Conexión:</b> <span id="connectState">Selecciona un pin de salida y luego uno de entrada.</span></div><div id="truth">SALIDA: —</div></div>
+ </section>
+</main>
+<script>
+const ws=document.getElementById('workspace'), svg=document.getElementById('wires');
+let nodes=[], wires=[], nextId=1, firstPin=null, drag=null;
+const gateNames={AND:'AND',OR:'OR',NOT:'NOT',NAND:'NAND',NOR:'NOR',XOR:'XOR',XNOR:'XNOR'};
+function addNode(type,x=35+(nodes.length%4)*175,y=35+Math.floor(nodes.length/4)*125){
+ const id=nextId++, n={id,type,x,y,value:0}; nodes.push(n); renderNode(n); evaluate(); return n;
+}
+function gateSvg(type){
+ const paths={
+ AND:'<path d="M8 8 H34 A26 26 0 0 1 34 60 H8 Z"/>',
+ OR:'<path d="M8 8 Q28 34 8 60 Q39 60 66 34 Q39 8 8 8 Z"/>',
+ XOR:'<><path d="M2 8 Q22 34 2 60"/><path d="M10 8 Q30 34 10 60 Q41 60 68 34 Q41 8 10 8 Z"/></>',
+ NAND:'<path d="M8 8 H30 A26 26 0 0 1 30 60 H8 Z"/><circle cx="67" cy="34" r="5"/>',
+ NOR:'<path d="M8 8 Q28 34 8 60 Q39 60 58 34 Q39 8 8 8 Z"/><circle cx="67" cy="34" r="5"/>',
+ NOT:'<path d="M10 8 L10 60 L58 34 Z"/><circle cx="67" cy="34" r="5"/>',
+ XNOR:'<><path d="M2 8 Q22 34 2 60"/><path d="M10 8 Q30 34 10 60 Q41 60 58 34 Q41 8 10 8 Z"/><circle cx="67" cy="34" r="5"/></>'
+ };
+ return `<svg viewBox="0 0 78 68" width="76" height="62" aria-label="Compuerta ${type}" class="gate-art">${paths[type]||paths.AND}</svg>`;
+}
+function renderNode(n){
+ const el=document.createElement('div'); el.className='node '+(n.type==='INPUT'?'input-node':n.type==='OUTPUT'?'output-node':'');el.dataset.id=n.id;el.style.left=n.x+'px';el.style.top=n.y+'px';
+ let body='';
+ if(n.type==='INPUT') body=`<span class="pin-label">VALOR</span><button class="toggle" data-toggle="${n.id}">0</button><span class="pin out" data-pin="${n.id}:out"></span>`;
+ else if(n.type==='OUTPUT') body=`<span class="pin" data-pin="${n.id}:in:0"></span><span class="pin-label">LED</span><span class="led" id="led-${n.id}"></span>`;
+ else {let count=n.type==='NOT'?1:2;body=`<span style="display:flex;flex-direction:column;gap:13px">${Array.from({length:count},(_,i)=>`<span class="pin" data-pin="${n.id}:in:${i}"></span>`).join('')}</span><span class="gate-symbol">${gateSvg(n.type)}</span><span class="pin out" data-pin="${n.id}:out"></span>`}
+ el.innerHTML=`<div class="node-head"><span>${n.type==='INPUT'?'ENTRADA':n.type==='OUTPUT'?'SALIDA':'COMPUERTA'}</span><span>#${n.id}</span></div><div class="node-body">${body}</div>`;
+ ws.appendChild(el);
+ el.querySelector('.node-head').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;drag={id:n.id,dx:e.clientX-n.x,dy:e.clientY-n.y};el.setPointerCapture(e.pointerId)});
+ el.addEventListener('pointermove',e=>{if(!drag||drag.id!==n.id)return;let r=ws.getBoundingClientRect();n.x=Math.max(0,Math.min(ws.clientWidth-155,e.clientX-r.left-(drag.dx-(r.left))));n.y=Math.max(0,Math.min(ws.clientHeight-95,e.clientY-r.top-(drag.dy-r.top)));el.style.left=n.x+'px';el.style.top=n.y+'px';drawWires()});
+ el.addEventListener('pointerup',()=>drag=null);el.addEventListener('pointercancel',()=>drag=null);
+ el.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>{n.value=1-n.value;b.textContent=n.value; b.classList.toggle('on',!!n.value);evaluate()}));
+ el.querySelectorAll('.pin').forEach(p=>p.addEventListener('click',()=>pinClick(p.dataset.pin)));
+}
+function pinClick(key){
+ const [id,kind,index]=key.split(':');const n=nodes.find(a=>a.id==id);if(!n)return;
+ if(kind==='out'){firstPin=key;document.getElementById('connectState').textContent='Ahora selecciona un pin de entrada.';return}
+ if(!firstPin){document.getElementById('connectState').textContent='Primero selecciona una salida verde.';return}
+ const [from]=firstPin.split(':');if(from===id){document.getElementById('connectState').textContent='Conecta componentes diferentes.';return}
+ wires=wires.filter(w=>!(w.to===key));wires.push({from:firstPin,to:key});firstPin=null;document.getElementById('connectState').textContent='Conexión creada. Puedes seguir conectando.';drawWires();evaluate();
+}
+function valueAt(nid,idx,seen=new Set()){
+ const w=wires.find(a=>a.to===`${nid}:in:${idx}`);if(!w)return 0;
+ const source=nodes.find(n=>n.id==w.from.split(':')[0]);if(!source||seen.has(source.id))return 0;
+ if(source.type==='INPUT')return source.value;
+ seen.add(source.id);return calc(source,seen);
+}
+function calc(n,seen=new Set()){
+ if(n.type==='INPUT')return n.value;
+ if(n.type==='OUTPUT')return valueAt(n.id,0,seen);
+ let a=valueAt(n.id,0,new Set(seen)),b=valueAt(n.id,1,new Set(seen)),v=0;
+ switch(n.type){case'AND':v=a&b;break;case'OR':v=a|b;break;case'NOT':v=1-a;break;case'NAND':v=1-(a&b);break;case'NOR':v=1-(a|b);break;case'XOR':v=a^b;break;case'XNOR':v=1-(a^b);break}
+ return v;
+}
+function evaluate(){
+ nodes.filter(n=>n.type==='OUTPUT').forEach(n=>{let v=valueAt(n.id,0);let led=document.getElementById('led-'+n.id);if(led)led.classList.toggle('on',!!v)});
+ let outs=nodes.filter(n=>n.type==='OUTPUT');document.getElementById('truth').textContent=outs.length?'SALIDA: '+outs.map(n=>calc(n)).join(', '):'SALIDA: —';
+}
+function drawWires(){
+ svg.innerHTML='';let rect=ws.getBoundingClientRect();
+ wires.forEach(w=>{let a=ws.querySelector(`[data-pin="${w.from}"]`),b=ws.querySelector(`[data-pin="${w.to}"]`);if(!a||!b)return;let ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();let x1=ar.left+ar.width/2-rect.left,y1=ar.top+ar.height/2-rect.top,x2=br.left+br.width/2-rect.left,y2=br.top+br.height/2-rect.top,mid=(x1+x2)/2;let p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',`M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`);p.setAttribute('class','wire');svg.appendChild(p)});
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>addNode(b.dataset.add)));
+document.getElementById('clearBtn').onclick=()=>{nodes=[];wires=[];nextId=1;firstPin=null;ws.querySelectorAll('.node').forEach(e=>e.remove());drawWires();evaluate();document.getElementById('connectState').textContent='Área limpia.'};
+document.getElementById('newBtn').onclick=()=>{document.getElementById('clearBtn').click();addNode('INPUT',30,55);addNode('INPUT',30,180);addNode('XOR',270,110);addNode('OUTPUT',510,110)};
+document.getElementById('helpBtn').onclick=()=>alert('1. Agrega entradas, compuertas y salidas desde el panel.\\n2. Haz clic en el pin verde de salida.\\n3. Haz clic en el pin azul de entrada.\\n4. Arrastra los bloques desde su encabezado.\\n5. Cambia 0/1 en las entradas para simular.\\n\\nNota: esta es una primera versión educativa.');
+window.addEventListener('resize',drawWires);
+document.getElementById('newBtn').click();
+</script>
+</body>
+</html>
